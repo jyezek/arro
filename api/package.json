@@ -1,0 +1,46 @@
+{
+  "name": "arro",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.78.0",
+    "@clerk/backend": "^3.2.0",
+    "@clerk/nextjs": "^7.0.4",
+    "@prisma/adapter-pg": "^7.5.0",
+    "@prisma/client": "^7.5.0",
+    "@sentry/nextjs": "^10.43.0",
+    "@supabase/supabase-js": "^2.99.1",
+    "@types/pg": "^8.18.0",
+    "anthropic": "^0.0.0",
+    "axios": "^1.13.6",
+    "cheerio": "^1.2.0",
+    "docx": "^9.6.1",
+    "mammoth": "^1.12.0",
+    "next": "16.1.6",
+    "openai": "^6.29.0",
+    "pdf-parse": "^2.4.5",
+    "pg": "^8.20.0",
+    "posthog-js": "^1.360.2",
+    "posthog-node": "^5.21.2",
+    "prisma": "^7.5.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "stripe": "^20.4.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20.19.37",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

@@ -1,0 +1,329 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Users ───────────────────────────────────────────────────────────────────
+
+model User {
+  id        String  @id @default(uuid())
+  clerkId   String  @unique
+  email     String  @unique
+  firstName String?
+  lastName  String?
+  phone     String?
+  location  String?
+  portfolioUrl String?
+  linkedinUrl  String?
+  masterResumeText   String?
+  masterResumeSource String?
+  role      String  @default("user") // "user" | "admin" | "tester"
+  suspended Boolean @default(false)
+  pendingDeletionAt DateTime? // set when user requests deletion; null = not pending
+
+  // Job preferences
+  targetSalary      Int?
+  salaryFlexibility String?
+  workPreference    String?
+  employmentTypes   String[] @default([])
+  targetRoleTypes   String[] @default([])
+  targetSeniority   String[] @default([])
+  targetIndustries  String[] @default([])
+  willingToRelocate Boolean?
+  equityImportance  String?
+
+  // Stripe billing
+  stripeCustomerId    String?   @unique
+  subscriptionId      String?   @unique
+  subscriptionStatus  String    @default("free") // "free" | "pro" | "cancelled"
+  subscriptionPriceId String?
+  currentPeriodEnd    DateTime?
+  paymentFailed       Boolean   @default(false)
+  pendingPlan         String?
+
+  // Credits
+  creditBalance          Int      @default(20)
+  creditsIncludedMonthly Int      @default(20)
+  lastCreditReset        DateTime @default(now())
+
+  // Onboarding
+  onboardingComplete Boolean @default(false)
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  experience            Experience[]
+  education             Education[]
+  skills                Skill[]
+  jobs                  Job[]
+  generatedResumes      GeneratedResume[]
+  prepKits              PrepKit[]
+  companyResearchItems  CompanyResearch[]
+  interviewSessions     InterviewSession[]
+  creditLedger          CreditLedgerEntry[]
+  deepDiveSessions      DeepDiveSession[]
+  processedStripeEvents ProcessedStripeEvent[]
+  jobQueryLinks         JobQueryLink[]
+
+  @@map("users")
+}
+
+// ─── Experience ───────────────────────────────────────────────────────────────
+
+model Experience {
+  id                    String   @id @default(uuid())
+  userId                String
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roleTitle             String
+  company               String
+  companyInitials       String?
+  startDate             String
+  endDate               String?
+  isCurrent             Boolean  @default(false)
+  description           String?
+  bullets               Bullet[]
+  detailScore           Int      @default(0)
+  deepDiveComplete      Boolean  @default(false)
+  deepDiveQuestionIndex Int      @default(0)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@map("experience")
+}
+
+model Bullet {
+  id           String     @id @default(uuid())
+  experienceId String
+  experience   Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  text         String
+  source       String     // "extracted" | "user_written" | "ai_suggested" | "ai_accepted"
+  accepted     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+
+  @@map("bullets")
+}
+
+// ─── Education ────────────────────────────────────────────────────────────────
+
+model Education {
+  id             String   @id @default(uuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  degree         String?
+  institution    String
+  fieldOfStudy   String?
+  graduationYear String?
+  createdAt      DateTime @default(now())
+
+  @@map("education")
+}
+
+// ─── Skills ───────────────────────────────────────────────────────────────────
+
+model Skill {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  category  String?  // "design" | "engineering" | "tools" | "soft" | "other"
+  createdAt DateTime @default(now())
+
+  @@map("skills")
+}
+
+// ─── Jobs ─────────────────────────────────────────────────────────────────────
+
+model Job {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  company     String
+  location    String?
+  url         String?
+  salary      String?
+  description String?
+  jobType     String?   // "full-time" | "part-time" | "contract" | "remote"
+  source      String?   // "linkedin" | "indeed" | "manual" | etc.
+  externalId  String?
+  isRemote    Boolean   @default(false)
+  tags        String[]  @default([])
+  postedAt    DateTime?
+  matchScore  Int?
+  matchReason String?
+  status      String    @default("saved") // "saved" | "applied" | "interviewing" | "offer" | "rejected"
+  isSeen      Boolean   @default(false)
+  isSaved     Boolean   @default(false)
+  isHidden    Boolean   @default(false)
+  savedAt     DateTime  @default(now())
+  appliedAt   DateTime?
+  nextStep    String?
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  generatedResumes  GeneratedResume[]
+  prepKits          PrepKit[]
+  companyResearchItems CompanyResearch[]
+  interviewSessions InterviewSession[]
+
+  @@unique([userId, externalId, source])
+  @@map("jobs")
+}
+
+// ─── Generated Resumes ────────────────────────────────────────────────────────
+
+model GeneratedResume {
+  id               String   @id @default(uuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobId            String?
+  job              Job?     @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  content          String   // JSON — structured resume sections
+  template         String   @default("classic")
+  tailoredSections String?  // JSON — which sections changed
+  tailoringReason  String?
+  status           String   @default("ready") // "generating" | "draft" | "ready"
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@map("generated_resumes")
+}
+
+// ─── Prep Kits ────────────────────────────────────────────────────────────────
+
+model PrepKit {
+  id               String   @id @default(uuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobId            String?
+  job              Job?     @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  coverLetter      String?
+  whyInterested    String?
+  biggestStrength  String?
+  elevatorPitch    String?
+  preparationNotes String?  // JSON array
+  screeningAnswers String?  // JSON array
+  followUpEmails   String?  // JSON array
+  negotiationNotes String?
+  companyResearch  String?  // JSON
+  status           String   @default("draft")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@map("prep_kits")
+}
+
+model CompanyResearch {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobId     String?
+  job       Job?     @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  content   String   // JSON
+  status    String   @default("draft") // "generating" | "draft" | "ready"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("company_research")
+}
+
+// ─── Interview Sessions ───────────────────────────────────────────────────────
+
+model InterviewSession {
+  id              String    @id @default(uuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobId           String?
+  job             Job?      @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  transcript      String?   // JSON — nulled after 90 days
+  copilotHistory  String?   // JSON — nulled after 90 days
+  debrief         String?   // JSON — generated on completion
+  durationSeconds Int?
+  questionsAnswered Int     @default(0)
+  avgConfidence   Int?
+  avgPace         Int?
+  status          String    @default("active") // "active" | "paused" | "completed" | "abandoned"
+  startedAt       DateTime  @default(now())
+  completedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("interview_sessions")
+}
+
+// ─── Credit Ledger ────────────────────────────────────────────────────────────
+
+model CreditLedgerEntry {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount      Int      // positive = add, negative = spend
+  type        String   // "purchase" | "monthly_reset" | "spend" | "admin_grant" | "refund" | "bonus" | "signup"
+  description String
+  featureKey  String?
+  jobId       String?
+  createdAt   DateTime @default(now())
+
+  @@map("credit_ledger")
+}
+
+// ─── Deep Dive Sessions ───────────────────────────────────────────────────────
+
+model DeepDiveSession {
+  id                  String   @id @default(uuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  experienceId        String
+  questionIndex       Int      @default(0)
+  conversationHistory String?  // JSON — nulled after 90 days
+  complete            Boolean  @default(false)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@map("deep_dive_sessions")
+}
+
+// ─── Job Query Links ──────────────────────────────────────────────────────────
+
+model JobQueryLink {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  platform  String
+  params    String   // JSON
+  url       String
+  createdAt DateTime @default(now())
+
+  @@map("job_query_links")
+}
+
+// ─── Processed Stripe Events ──────────────────────────────────────────────────
+
+model ProcessedStripeEvent {
+  id            String   @id @default(uuid())
+  stripeEventId String   @unique
+  userId        String?
+  user          User?    @relation(fields: [userId], references: [id])
+  eventType     String
+  processedAt   DateTime @default(now())
+
+  @@map("processed_stripe_events")
+}
+
+// ─── Deletion Log (GDPR) ──────────────────────────────────────────────────────
+
+model DeletionLog {
+  id        String   @id @default(uuid())
+  clerkId   String
+  deletedAt DateTime @default(now())
+  reason    String
+
+  @@map("deletion_log")
+}

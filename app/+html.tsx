@@ -22,17 +22,21 @@ export default function Root({ children }: { children: React.ReactNode }) {
         <style dangerouslySetInnerHTML={{ __html: responsiveBackground }} />
         {/* Add any additional <head> elements that you want globally available on web... */}
       </head>
-      <body>{children}</body>
+      <body>
+        {/* Required by Clerk bot protection on web */}
+        <div id="clerk-captcha" />
+        {children}
+      </body>
     </html>
   );
 }
 
 const responsiveBackground = `
 body {
-  background-color: #fff;
+  background-color: #F5F0EA;
 }
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: #000;
-  }
+#clerk-captcha {
+  position: absolute;
+  bottom: 0;
+  left: 0;
 }`;

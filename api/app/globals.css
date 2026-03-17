@@ -1,0 +1,466 @@
+@import "tailwindcss";
+
+/* ─── Arro Design Tokens ─────────────────────────────────────────────────── */
+
+:root {
+  /* Brand */
+  --arro-orange:       #E8650A;
+  --arro-orange-light: #FDF1E8;
+  --arro-orange-dim:   #7A3005;
+
+  /* Neutrals */
+  --arro-dark:   #1A1410;
+  --arro-dark-2: #1E1A16;
+  --arro-warm:   #F5F0EA;
+  --arro-warm-2: #EDE8E0;
+  --arro-white:  #FFFFFF;
+
+  /* Semantic */
+  --arro-green:      #5DCAA5;
+  --arro-green-bg:   rgba(93,202,165,.1);
+  --arro-green-text: #085041;
+  --arro-blue:       #378ADD;
+  --arro-blue-bg:    rgba(55,138,221,.1);
+  --arro-blue-text:  #0C447C;
+  --arro-amber:      #EF9F27;
+  --arro-amber-bg:   rgba(239,158,39,.1);
+  --arro-amber-text: #633806;
+  --arro-red:        #E24B4A;
+  --arro-red-bg:     rgba(226,75,74,.05);
+  --arro-red-text:   #791F1F;
+
+  /* Typography scale */
+  --text-xs:   10px;
+  --text-sm:   11px;
+  --text-base: 12px;
+  --text-md:   13px;
+  --text-lg:   14px;
+  --text-xl:   15px;
+  --text-2xl:  17px;
+  --text-3xl:  20px;
+  --text-hero: 22px;
+
+  /* Easing */
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --spring:   cubic-bezier(.34, 1.56, .64, 1);
+
+  /* App background */
+  --background: var(--arro-warm);
+  --foreground: var(--arro-dark);
+}
+
+/* ─── Base Reset ─────────────────────────────────────────────────────────── */
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--arro-warm);
+  color: var(--arro-dark);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Keyframes ──────────────────────────────────────────────────────────── */
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .35; }
+}
+
+@keyframes orbPulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.1); }
+}
+
+@keyframes orbRing {
+  0%   { transform: scale(1); opacity: .4; }
+  100% { transform: scale(1.75); opacity: 0; }
+}
+
+@keyframes listenRing {
+  0%   { transform: scale(1); opacity: .5; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+@keyframes tabPop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(.88); }
+  70%  { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+@keyframes cueIn {
+  from { opacity: 0; transform: translateY(6px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes shine {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .3; }
+}
+
+@keyframes fillBar {
+  from { width: 0; }
+  to   { width: var(--target-width); }
+}
+
+@keyframes popIn {
+  0%   { transform: scale(0.5); opacity: 0; }
+  70%  { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes creditBounce {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.18); }
+  60%  { transform: scale(.95); }
+  100% { transform: scale(1); }
+}
+
+/* ─── Utility classes ────────────────────────────────────────────────────── */
+
+.animate-fadeUp     { animation: fadeUp .32s var(--ease-out) both; }
+.animate-slideIn    { animation: slideIn .32s var(--ease-out) both; }
+.animate-cueIn      { animation: cueIn .28s ease-out both; }
+.animate-pulse-dot  { animation: pulse 1.4s ease-in-out infinite; }
+.animate-orb-pulse  { animation: orbPulse 2.1s ease-in-out infinite; }
+.animate-blink      { animation: blink 1.2s ease-in-out infinite; }
+.animate-popIn      { animation: popIn .4s var(--spring) both; }
+.animate-fadeIn     { animation: fadeIn .28s ease both; }
+.animate-shine      {
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.4) 50%, rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  animation: shine 1.4s linear infinite;
+}
+
+/* Skeleton shimmer */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--arro-warm-2) 25%,
+    rgba(237,232,224,.6) 50%,
+    var(--arro-warm-2) 75%
+  );
+  background-size: 200% 100%;
+  animation: shine 1.4s linear infinite;
+  border-radius: 6px;
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────────────────── */
+
+::-webkit-scrollbar { width: 0; height: 0; }
+
+/* ─── Credit pill states ─────────────────────────────────────────────────── */
+
+.credit-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  background: rgba(26,20,16,.06);
+  color: rgba(26,20,16,.55);
+}
+.credit-pill.low {
+  background: var(--arro-amber-bg);
+  color: var(--arro-amber-text);
+}
+.credit-pill.empty {
+  background: rgba(226,75,74,.08);
+  color: var(--arro-red-text);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+/* ─── Card interactive states ────────────────────────────────────────────── */
+
+.card-pressable {
+  transition: transform .15s ease;
+  cursor: pointer;
+}
+.card-pressable:active { transform: scale(.975); }
+
+/* ─── Filter chips ───────────────────────────────────────────────────────── */
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: var(--text-base);
+  font-weight: 500;
+  border: 1.5px solid rgba(26,20,16,.1);
+  color: rgba(26,20,16,.45);
+  cursor: pointer;
+  transition: all .15s var(--ease-out);
+  white-space: nowrap;
+  user-select: none;
+}
+.filter-chip:active { transform: scale(.94); }
+.filter-chip.active {
+  background: var(--arro-orange);
+  border-color: var(--arro-orange);
+  color: #fff;
+  transform: scale(1.02);
+}
+
+/* ─── Bottom tab bar ─────────────────────────────────────────────────────── */
+
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 76px;
+  background: #fff;
+  border-top: 1px solid rgba(26,20,16,.07);
+  display: flex;
+  align-items: flex-start;
+  padding-top: 10px;
+  z-index: 100;
+}
+
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  padding: 2px 0;
+}
+
+.tab-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(26,20,16,.25);
+  transition: all .2s var(--ease-out);
+}
+
+.tab-item.active .tab-icon {
+  background: var(--arro-dark);
+  color: var(--arro-warm);
+  transform: scale(1.05);
+}
+
+.tab-label {
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: .01em;
+  color: rgba(26,20,16,.3);
+}
+.tab-item.active .tab-label {
+  color: var(--arro-dark);
+  font-weight: 600;
+}
+
+/* ─── Navigation header ──────────────────────────────────────────────────── */
+
+.nav-header {
+  padding: 12px 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-back-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(26,20,16,.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all .15s ease;
+  flex-shrink: 0;
+}
+.nav-back-btn:active {
+  transform: scale(.88);
+  background: rgba(26,20,16,.12);
+}
+
+.nav-title {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--arro-dark);
+  letter-spacing: -.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── Inputs ─────────────────────────────────────────────────────────────── */
+
+.arro-input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 11px;
+  border: 1.5px solid rgba(26,20,16,.12);
+  background: #fff;
+  font-size: var(--text-md);
+  color: var(--arro-dark);
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+  font-family: inherit;
+}
+.arro-input:focus {
+  border-color: var(--arro-orange);
+  box-shadow: 0 0 0 3px rgba(232,101,10,.1);
+}
+.arro-input::placeholder { color: rgba(26,20,16,.3); }
+
+/* ─── Buttons ────────────────────────────────────────────────────────────── */
+
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 15px 24px;
+  border-radius: 16px;
+  background: var(--arro-orange);
+  color: #fff;
+  font-size: var(--text-xl);
+  font-weight: 600;
+  letter-spacing: -.01em;
+  cursor: pointer;
+  transition: all .15s ease;
+  border: none;
+  outline: none;
+  font-family: inherit;
+}
+.btn-primary:active { transform: scale(.97); background: #c55208; }
+.btn-primary:disabled { opacity: .55; cursor: not-allowed; }
+
+.btn-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 24px;
+  border-radius: 16px;
+  background: transparent;
+  color: rgba(26,20,16,.55);
+  font-size: var(--text-xl);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s ease;
+  border: 1.5px solid rgba(26,20,16,.1);
+  outline: none;
+  font-family: inherit;
+}
+.btn-secondary:active { transform: scale(.97); background: rgba(26,20,16,.04); }
+
+/* ─── Status badges ──────────────────────────────────────────────────────── */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: .03em;
+}
+.badge-orange { background: rgba(232,101,10,.1); color: rgba(126,50,5,.9); }
+.badge-green  { background: var(--arro-green-bg); color: var(--arro-green-text); }
+.badge-blue   { background: var(--arro-blue-bg);  color: var(--arro-blue-text); }
+.badge-amber  { background: var(--arro-amber-bg);  color: var(--arro-amber-text); }
+.badge-red    { background: var(--arro-red-bg);    color: var(--arro-red-text); }
+.badge-muted  { background: var(--arro-warm); color: rgba(26,20,16,.45); }
+
+/* ─── Bottom sheet ───────────────────────────────────────────────────────── */
+
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(26,20,16,.35);
+  z-index: 200;
+  animation: fadeIn .28s ease;
+}
+
+.sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-radius: 24px 24px 0 0;
+  max-height: 91vh;
+  overflow-y: auto;
+  z-index: 201;
+  animation: slideUp .38s var(--ease-out);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.sheet-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(26,20,16,.1);
+  margin: 12px auto 0;
+}
+
+/* ─── Section cards ──────────────────────────────────────────────────────── */
+
+.section-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 16px;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: border-color .15s ease, transform .15s ease;
+}
+.section-card:hover { border-color: rgba(26,20,16,.08); }
+.section-card:active { transform: scale(.975); }
+
+/* ─── Main content padding for tab bar ──────────────────────────────────── */
+
+.page-content {
+  min-height: 100vh;
+  padding-bottom: 88px; /* tab bar height + padding */
+}
