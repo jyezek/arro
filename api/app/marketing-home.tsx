@@ -836,9 +836,10 @@ export default function MarketingHome({ appBaseUrl }: MarketingHomeProps) {
             <div>
               <div className={styles.footerTitle}>Product</div>
               <div className={styles.footerLinks}>
-                <a href="#resume">Master resume</a>
-                <a href="#features">Features</a>
-                <a href="#interview">Interview copilot</a>
+                <a href="/jobs">Job feed</a>
+                <a href="/resume">Resume builder</a>
+                <a href="/interview">Interview copilot</a>
+                <a href="/prep-kit">Prep kit</a>
                 <a href="#pricing">Pricing</a>
               </div>
             </div>

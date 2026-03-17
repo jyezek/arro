@@ -1,0 +1,148 @@
+.page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px 20px;
+  background:
+    radial-gradient(circle at top left, rgba(255, 137, 31, 0.18), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(106, 160, 255, 0.12), transparent 32%),
+    #0f0d0b;
+  color: #f4efe8;
+}
+
+.shell {
+  width: min(100%, 1120px);
+  display: grid;
+  grid-template-columns: minmax(280px, 420px) minmax(320px, 480px);
+  gap: 28px;
+  align-items: stretch;
+}
+
+.panel {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 28px;
+  background: rgba(22, 19, 16, 0.9);
+  box-shadow: 0 26px 80px rgba(0, 0, 0, 0.34);
+  backdrop-filter: blur(18px);
+}
+
+.intro {
+  padding: 36px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 232, 0.72);
+}
+
+.eyebrowLine {
+  width: 34px;
+  height: 1px;
+  background: linear-gradient(90deg, #ff7a1a, rgba(255, 122, 26, 0));
+}
+
+.title {
+  margin: 18px 0 12px;
+  font-size: clamp(2rem, 3vw, 3.4rem);
+  line-height: 0.96;
+  font-weight: 600;
+  letter-spacing: -0.05em;
+}
+
+.accent {
+  color: #ff8d3a;
+}
+
+.deck {
+  max-width: 34ch;
+  margin: 0;
+  font-size: 1.02rem;
+  line-height: 1.7;
+  color: rgba(244, 239, 232, 0.78);
+}
+
+.points {
+  display: grid;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.point {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+.pointDot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(255, 141, 58, 0.14);
+  color: #ff9d56;
+  font-size: 0.82rem;
+}
+
+.pointText {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: rgba(244, 239, 232, 0.74);
+}
+
+.homeLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 28px;
+  color: rgba(244, 239, 232, 0.9);
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.authCard {
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.authCard :global(.cl-rootBox),
+.authCard :global(.cl-cardBox) {
+  width: 100%;
+}
+
+.authCard :global(.cl-card) {
+  width: 100%;
+  border: 0;
+  border-radius: 22px;
+  background: #171411;
+  box-shadow: none;
+}
+
+.authCard :global(.cl-footerActionLink),
+.authCard :global(.cl-navbarButton),
+.authCard :global(.cl-formButtonPrimary) {
+  color: inherit;
+}
+
+@media (max-width: 900px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .intro {
+    padding: 28px 24px;
+  }
+}
