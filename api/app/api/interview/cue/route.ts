@@ -5,7 +5,6 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
-import type { Prisma } from '@prisma/client'
 import { canAccessUserResource, getAuthErrorResponse, getOrCreateUser } from '@/lib/auth'
 import { db } from '@/lib/db'
 
@@ -13,11 +12,15 @@ export const maxDuration = 15
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
-type ExperienceCueContext = Prisma.ExperienceGetPayload<{
-  include: { bullets: true }
-}>
+type ExperienceCueContext = {
+  roleTitle: string
+  company: string
+  bullets: Array<{ text: string }>
+}
 
-type SkillCueContext = Prisma.SkillGetPayload<Record<string, never>>
+type SkillCueContext = {
+  name: string
+}
 
 export async function POST(req: NextRequest) {
   try {
