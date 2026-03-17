@@ -17,11 +17,18 @@ export const viewport: Viewport = {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <ClerkProvider>
-      <html lang="en">
-        <body>{children}</body>
-      </html>
-    </ClerkProvider>
+  const publishableKey =
+    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY
+
+  const content = (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
   )
+
+  if (!publishableKey) {
+    return content
+  }
+
+  return <ClerkProvider publishableKey={publishableKey}>{content}</ClerkProvider>
 }

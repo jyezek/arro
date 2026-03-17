@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
 
 export async function GET() {
   try {
+    const { db } = await import('@/lib/db')
     await db.$queryRaw`SELECT 1`
 
     const stripeKey = process.env.STRIPE_SECRET_KEY ?? ''
