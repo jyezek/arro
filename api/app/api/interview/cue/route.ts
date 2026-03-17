@@ -5,12 +5,19 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
+import type { Prisma } from '@prisma/client'
 import { canAccessUserResource, getAuthErrorResponse, getOrCreateUser } from '@/lib/auth'
 import { db } from '@/lib/db'
 
 export const maxDuration = 15
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+
+type ExperienceCueContext = Prisma.ExperienceGetPayload<{
+  include: { bullets: true }
+}>
+
+type SkillCueContext = Prisma.SkillGetPayload<Record<string, never>>
 
 export async function POST(req: NextRequest) {
   try {
@@ -45,10 +52,16 @@ export async function POST(req: NextRequest) {
       : 'General interview'
 
     const experienceSummary = experience
-      .map(e => `${e.roleTitle} at ${e.company}${e.bullets[0] ? ': ' + e.bullets[0].text : ''}`)
+      .map(
+        (e: ExperienceCueContext) =>
+          `${e.roleTitle} at ${e.company}${e.bullets[0] ? ': ' + e.bullets[0].text : ''}`
+      )
       .join('; ')
 
-    const themes = skills.slice(0, 8).map(s => s.name).join(', ')
+    const themes = skills
+      .slice(0, 8)
+      .map((s: SkillCueContext) => s.name)
+      .join(', ')
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
