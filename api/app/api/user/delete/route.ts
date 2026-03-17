@@ -7,13 +7,14 @@
 // Stripe subscription is cancelled immediately on request.
 import { NextResponse } from 'next/server'
 import { getAuthErrorResponse, getOrCreateUser } from '@/lib/auth'
-import { stripe } from '@/lib/stripe'
+import { getStripe } from '@/lib/stripe'
 import { db } from '@/lib/db'
 
 const GRACE_PERIOD_DAYS = 30
 
 export async function POST() {
   try {
+    const stripe = getStripe()
     const user = await getOrCreateUser()
 
     if (user.pendingDeletionAt) {

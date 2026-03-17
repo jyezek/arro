@@ -1,10 +1,11 @@
 // POST /api/stripe/create-checkout-session
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthErrorResponse, getOrCreateUser } from '@/lib/auth'
-import { getOrCreateStripeCustomer, stripe } from '@/lib/stripe'
+import { getOrCreateStripeCustomer, getStripe } from '@/lib/stripe'
 
 export async function POST(req: NextRequest) {
   try {
+    const stripe = getStripe()
     const user = await getOrCreateUser()
     const { priceId, type, credits } = await req.json() as {
       priceId: string

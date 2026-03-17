@@ -1,12 +1,21 @@
 import Stripe from 'stripe'
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('Missing STRIPE_SECRET_KEY')
-}
+let stripeClient: Stripe | null = null
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2026-02-25.clover',
-})
+export function getStripe() {
+  if (stripeClient) return stripeClient
+
+  const secretKey = process.env.STRIPE_SECRET_KEY
+  if (!secretKey) {
+    throw new Error('Missing STRIPE_SECRET_KEY')
+  }
+
+  stripeClient = new Stripe(secretKey, {
+    apiVersion: '2026-02-25.clover',
+  })
+
+  return stripeClient
+}
 
 export async function getOrCreateStripeCustomer(
   userId: string,
@@ -18,7 +27,7 @@ export async function getOrCreateStripeCustomer(
   if (!user) throw new Error('User not found')
   if (user.stripeCustomerId) return user.stripeCustomerId
 
-  const customer = await stripe.customers.create({
+  const customer = await getStripe().customers.create({
     email,
     name: name ?? email,
     metadata: { userId },

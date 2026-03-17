@@ -1,10 +1,11 @@
 // POST /api/stripe/create-portal-session
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthErrorResponse, getOrCreateUser } from '@/lib/auth'
-import { stripe } from '@/lib/stripe'
+import { getStripe } from '@/lib/stripe'
 
 export async function POST(req: NextRequest) {
   try {
+    const stripe = getStripe()
     const user = await getOrCreateUser()
 
     if (!user.stripeCustomerId) {

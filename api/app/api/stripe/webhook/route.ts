@@ -1,12 +1,13 @@
 // POST /api/stripe/webhook
 // Verifies Stripe signature, processes billing events, updates DB idempotently.
 import { NextRequest, NextResponse } from 'next/server'
-import { stripe } from '@/lib/stripe'
+import { getStripe } from '@/lib/stripe'
 import { db } from '@/lib/db'
 import { addCredits } from '@/lib/credits'
 import { track } from '@/lib/analytics'
 
 export async function POST(req: NextRequest) {
+  const stripe = getStripe()
   const body = await req.text()
   const sig = req.headers.get('stripe-signature')
 
