@@ -6,8 +6,6 @@ import { db } from '@/lib/db'
 import { addCredits } from '@/lib/credits'
 import { track } from '@/lib/analytics'
 
-export const config = { api: { bodyParser: false } }
-
 export async function POST(req: NextRequest) {
   const body = await req.text()
   const sig = req.headers.get('stripe-signature')
