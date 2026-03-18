@@ -389,14 +389,16 @@ export default function MarketingHome({ appBaseUrl, waitlistMode }: MarketingHom
           ))}
         </div>
 
-        <div className={styles.navRight}>
-          <a href={signInHref} className={styles.navSignIn}>
-            Sign in
-          </a>
-          <a href={freeHref} className={styles.navCta}>
-            Start free
-          </a>
-        </div>
+        {!waitlistMode ? (
+          <div className={styles.navRight}>
+            <a href={signInHref} className={styles.navSignIn}>
+              Sign in
+            </a>
+            <a href={freeHref} className={styles.navCta}>
+              Start free
+            </a>
+          </div>
+        ) : null}
       </nav>
 
       <div className={styles.heroWrap} id="top">
@@ -425,7 +427,7 @@ export default function MarketingHome({ appBaseUrl, waitlistMode }: MarketingHom
 
             <div className={styles.heroActions}>
               {waitlistMode ? (
-                <WaitlistForm source="home" ctaLabel="Join the waitlist" placeholder="Your work email" />
+                <WaitlistForm source="home" ctaLabel="Join the waitlist" placeholder="Enter your email" />
               ) : (
                 <a href={freeHref} className={styles.primaryCta}>
                   Start free — no card needed

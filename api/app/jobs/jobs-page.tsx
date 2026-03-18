@@ -226,10 +226,12 @@ export default function JobsPage({ appBaseUrl, waitlistMode }: JobsPageProps) {
           <a href="/prep-kit" className={styles.navLink}>Prep kit</a>
           <a href="/jobs" className={`${styles.navLink} ${styles.navLinkActive}`}>Job feed</a>
         </div>
-        <div className={styles.navRight}>
-          <a href={signInHref} className={styles.navSignIn}>Sign in</a>
-          <a href={signUpHref} className={styles.navCta}>Start free</a>
-        </div>
+        {!waitlistMode ? (
+          <div className={styles.navRight}>
+            <a href={signInHref} className={styles.navSignIn}>Sign in</a>
+            <a href={signUpHref} className={styles.navCta}>Start free</a>
+          </div>
+        ) : null}
       </nav>
 
       {/* Hero */}
