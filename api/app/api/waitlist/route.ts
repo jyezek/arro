@@ -1,9 +1,15 @@
 // POST /api/waitlist
 import { NextRequest, NextResponse } from 'next/server'
+import { resolveAppBaseUrl } from '@/app/app-base-url'
 import { db } from '@/lib/db'
+import { handleWaitlistEmails } from '@/lib/waitlist-email'
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
+
+function isUniqueConstraintError(err: unknown): boolean {
+  return typeof err === 'object' && err !== null && 'code' in err && err.code === 'P2002'
 }
 
 export async function POST(req: NextRequest) {
@@ -17,10 +23,32 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Valid email required' }, { status: 400 })
     }
 
-    await db.waitlistEntry.upsert({
+    let isNewSignup = false
+
+    const existing = await db.waitlistEntry.findUnique({
       where: { email },
-      create: { email, name, source },
-      update: {},  // already on list — don't overwrite, just ack
+      select: { id: true },
+    })
+
+    if (!existing) {
+      try {
+        await db.waitlistEntry.create({
+          data: { email, name, source },
+        })
+        isNewSignup = true
+      } catch (err) {
+        if (!isUniqueConstraintError(err)) {
+          throw err
+        }
+      }
+    }
+
+    await handleWaitlistEmails({
+      email,
+      name,
+      source,
+      appUrl: resolveAppBaseUrl(),
+      isNewSignup,
     })
 
     return NextResponse.json({ ok: true })
