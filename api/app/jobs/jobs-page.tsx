@@ -189,7 +189,7 @@ export default function JobsPage({ appBaseUrl, waitlistMode }: JobsPageProps) {
   const crossPromo = ALL_FEATURES.filter((f) => f.href !== '/jobs')
 
   return (
-    <main className={`${styles.page} ${dmSans.className}`} style={pageStyle}>
+    <main className={`${styles.page} ${dmSans.className}`} style={pageStyle} id="top">
       <style jsx global>{`
         @font-face {
           font-family: 'Geist';
@@ -247,7 +247,9 @@ export default function JobsPage({ appBaseUrl, waitlistMode }: JobsPageProps) {
               <span className={styles.accent}> 50+ sources.</span>
             </h1>
             <p className={styles.heroDeck}>
-              Aggregated from LinkedIn, Indeed, Dice, and dozens more — then ranked by how well each role actually matches your background. See the jobs most likely to want you, first.
+              {waitlistMode
+                ? 'This is the job feed early-access users will get first: roles from 50+ sources, ranked by actual fit instead of recency.'
+                : 'Aggregated from LinkedIn, Indeed, Dice, and dozens more — then ranked by how well each role actually matches your background. See the jobs most likely to want you, first.'}
             </p>
             <div className={styles.heroActions}>
               {waitlistMode ? (
@@ -378,7 +380,7 @@ export default function JobsPage({ appBaseUrl, waitlistMode }: JobsPageProps) {
         <div className={styles.sectionWrap}>
           <div className={`${styles.eyebrow} ${styles.reveal}`}>
             <span className={styles.eyebrowLine} />
-            Also in Arro
+            {waitlistMode ? 'Also coming in Arro' : 'Also in Arro'}
           </div>
           <h2 className={`${styles.sectionTitleSm} ${styles.reveal}`}>The whole platform works together.</h2>
           <div className={styles.promoGrid}>
@@ -425,7 +427,9 @@ export default function JobsPage({ appBaseUrl, waitlistMode }: JobsPageProps) {
                 <span className={styles.footerWordmark}>arro</span>
               </a>
               <p className={styles.footerTagline}>Your career, forward. AI-powered job search for people who take getting hired seriously.</p>
-              <a href={signUpHref} className={styles.footerStart}>Start free <ArrowMark size={12} /></a>
+              <a href={waitlistMode ? '#top' : signUpHref} className={styles.footerStart}>
+                {waitlistMode ? 'Join waitlist' : 'Start free'} <ArrowMark size={12} />
+              </a>
             </div>
             <div>
               <div className={styles.footerTitle}>Product</div>

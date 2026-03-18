@@ -1,7 +1,13 @@
+import { redirect } from 'next/navigation'
 import { SignUp } from '@clerk/nextjs'
+import { resolveWaitlistMode } from '../../app-base-url'
 import styles from '../../auth-page.module.css'
 
 export default function SignUpPage() {
+  if (resolveWaitlistMode()) {
+    redirect('/')
+  }
+
   return (
     <main className={styles.page}>
       <div className={styles.shell}>

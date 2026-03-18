@@ -165,6 +165,24 @@ const proofItems = [
   'Real-time interview coaching',
 ]
 
+const earlyAccessSteps: Point[] = [
+  {
+    title: 'Join the waitlist',
+    description:
+      'Drop your email and tell us what part of the job search is currently the most painful for you.',
+  },
+  {
+    title: 'Get invited in waves',
+    description:
+      'We are onboarding users in small batches so we can tighten the product and stay close to feedback.',
+  },
+  {
+    title: 'Build your profile first',
+    description:
+      'Early access starts with your master resume, job preferences, and AI-assisted setup so Arro has real context from day one.',
+  },
+]
+
 function buildHref(appBaseUrl: string, path: string): string {
   if (!appBaseUrl) return path
   if (path.startsWith('http://') || path.startsWith('https://')) return path
@@ -217,6 +235,7 @@ export default function MarketingHome({ appBaseUrl, waitlistMode }: MarketingHom
   const signUpHref = buildHref(appBaseUrl, '/sign-up')
   const signInHref = buildHref(appBaseUrl, '/sign-in')
   const freeHref = signUpHref
+  const primaryFooterHref = waitlistMode ? '#top' : freeHref
   const proHref = buildHref(
     appBaseUrl,
     billing === 'annual' ? '/sign-up?plan=pro_annual' : '/sign-up?plan=pro_monthly',
@@ -377,7 +396,7 @@ export default function MarketingHome({ appBaseUrl, waitlistMode }: MarketingHom
             ['#resume', 'Master resume'],
             ['#features', 'Features'],
             ['#interview', 'Interview'],
-            ['#pricing', 'Pricing'],
+            ...(!waitlistMode ? [['#pricing', 'Pricing']] : []),
           ].map(([href, label]) => (
             <a
               key={href}
@@ -406,7 +425,7 @@ export default function MarketingHome({ appBaseUrl, waitlistMode }: MarketingHom
           <div className={styles.heroLeft}>
             <div className={styles.kicker}>
               <span className={styles.kickerLine} />
-              AI-powered job search
+              {waitlistMode ? 'Early access waitlist' : 'AI-powered job search'}
             </div>
 
             <h1 className={styles.heroTitle}>
@@ -420,9 +439,19 @@ export default function MarketingHome({ appBaseUrl, waitlistMode }: MarketingHom
             </h1>
 
             <p className={styles.heroDeck}>
-              Arro gives you a <strong>master resume</strong> that tailors itself to every job, an AI that preps your
-              applications in seconds, and a <strong>practice interview with a live copilot</strong> — so you walk in
-              knowing exactly what to say.
+              {waitlistMode ? (
+                <>
+                  Join early access for the AI job search copilot that gives you a <strong>master resume</strong>,
+                  role-specific application prep, and a <strong>practice interview with a live copilot</strong> before
+                  the full app opens publicly.
+                </>
+              ) : (
+                <>
+                  Arro gives you a <strong>master resume</strong> that tailors itself to every job, an AI that preps
+                  your applications in seconds, and a <strong>practice interview with a live copilot</strong> — so you
+                  walk in knowing exactly what to say.
+                </>
+              )}
             </p>
 
             <div className={styles.heroActions}>
@@ -730,97 +759,131 @@ export default function MarketingHome({ appBaseUrl, waitlistMode }: MarketingHom
         </div>
       </section>
 
-      <section className={styles.pricingSection} id="pricing">
-        <div className={styles.sectionWrap}>
-          <div className={`${styles.eyebrow} ${styles.reveal}`}>
-            <span className={styles.eyebrowLine} />
-            Pricing
-          </div>
-          <h2 className={`${styles.sectionTitle} ${styles.reveal}`}>
-            Start free.
-            <br />
-            Pay when it&apos;s <span className={styles.accent}>worth it.</span>
-          </h2>
-          <p className={`${styles.sectionDeck} ${styles.reveal}`}>
-            Most people get hired on the free plan. Upgrade when you&apos;re applying seriously — or top up credits
-            for the features that need more AI.
-          </p>
-
-          <div className={`${styles.pricingToggleRow} ${styles.reveal}`}>
-            <div className={styles.toggleShell}>
-              <button
-                type="button"
-                className={`${styles.toggleButton} ${billing === 'monthly' ? styles.toggleButtonActive : ''}`}
-                onClick={() => setBilling('monthly')}
-              >
-                Monthly
-              </button>
-              <button
-                type="button"
-                className={`${styles.toggleButton} ${billing === 'annual' ? styles.toggleButtonActive : ''}`}
-                onClick={() => setBilling('annual')}
-              >
-                Annual
-              </button>
+      {!waitlistMode ? (
+        <section className={styles.pricingSection} id="pricing">
+          <div className={styles.sectionWrap}>
+            <div className={`${styles.eyebrow} ${styles.reveal}`}>
+              <span className={styles.eyebrowLine} />
+              Pricing
             </div>
-            {billing === 'annual' ? <span className={styles.savePill}>Save 25%</span> : null}
-          </div>
+            <h2 className={`${styles.sectionTitle} ${styles.reveal}`}>
+              Start free.
+              <br />
+              Pay when it&apos;s <span className={styles.accent}>worth it.</span>
+            </h2>
+            <p className={`${styles.sectionDeck} ${styles.reveal}`}>
+              Most people get hired on the free plan. Upgrade when you&apos;re applying seriously — or top up credits
+              for the features that need more AI.
+            </p>
 
-          <div className={`${styles.planGrid} ${styles.reveal}`}>
-            {plans.map((plan) => (
-              <article
-                key={plan.tier}
-                className={`${styles.planCard} ${
-                  plan.variant === 'featured'
-                    ? styles.planCardFeatured
-                    : plan.variant === 'warm'
-                      ? styles.planCardWarm
-                      : ''
-                }`}
-              >
-                {plan.badge ? <div className={styles.planBadge}>{plan.badge}</div> : null}
-                <div className={styles.planTier}>{plan.tier}</div>
-                <div className={styles.planPrice}>
-                  {plan.price}
-                  <span className={styles.planUnit}>{plan.unit}</span>
-                </div>
-                <div className={styles.planCadence}>{plan.cadence}</div>
-                <div className={styles.planDivider} />
-                <ul className={styles.planFeatureList}>
-                  {plan.features.map((feature) => (
-                    <li
-                      key={feature.label}
-                      className={`${styles.planFeature} ${feature.included ? '' : styles.planFeatureMuted}`}
-                    >
-                      <span className={feature.included ? styles.planIconCheck : styles.planIconClose}>
-                        {feature.included ? <CheckMark /> : <CloseMark />}
-                      </span>
-                      {feature.label}
-                    </li>
-                  ))}
-                </ul>
-                <a
-                  href={plan.href}
-                  className={`${styles.planButton} ${
+            <div className={`${styles.pricingToggleRow} ${styles.reveal}`}>
+              <div className={styles.toggleShell}>
+                <button
+                  type="button"
+                  className={`${styles.toggleButton} ${billing === 'monthly' ? styles.toggleButtonActive : ''}`}
+                  onClick={() => setBilling('monthly')}
+                >
+                  Monthly
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.toggleButton} ${billing === 'annual' ? styles.toggleButtonActive : ''}`}
+                  onClick={() => setBilling('annual')}
+                >
+                  Annual
+                </button>
+              </div>
+              {billing === 'annual' ? <span className={styles.savePill}>Save 25%</span> : null}
+            </div>
+
+            <div className={`${styles.planGrid} ${styles.reveal}`}>
+              {plans.map((plan) => (
+                <article
+                  key={plan.tier}
+                  className={`${styles.planCard} ${
                     plan.variant === 'featured'
-                      ? styles.planButtonSolid
+                      ? styles.planCardFeatured
                       : plan.variant === 'warm'
-                        ? styles.planButtonWarm
-                        : styles.planButtonOutline
+                        ? styles.planCardWarm
+                        : ''
                   }`}
                 >
-                  {plan.cta}
-                </a>
-              </article>
-            ))}
-          </div>
+                  {plan.badge ? <div className={styles.planBadge}>{plan.badge}</div> : null}
+                  <div className={styles.planTier}>{plan.tier}</div>
+                  <div className={styles.planPrice}>
+                    {plan.price}
+                    <span className={styles.planUnit}>{plan.unit}</span>
+                  </div>
+                  <div className={styles.planCadence}>{plan.cadence}</div>
+                  <div className={styles.planDivider} />
+                  <ul className={styles.planFeatureList}>
+                    {plan.features.map((feature) => (
+                      <li
+                        key={feature.label}
+                        className={`${styles.planFeature} ${feature.included ? '' : styles.planFeatureMuted}`}
+                      >
+                        <span className={feature.included ? styles.planIconCheck : styles.planIconClose}>
+                          {feature.included ? <CheckMark /> : <CloseMark />}
+                        </span>
+                        {feature.label}
+                      </li>
+                    ))}
+                  </ul>
+                  <a
+                    href={plan.href}
+                    className={`${styles.planButton} ${
+                      plan.variant === 'featured'
+                        ? styles.planButtonSolid
+                        : plan.variant === 'warm'
+                          ? styles.planButtonWarm
+                          : styles.planButtonOutline
+                    }`}
+                  >
+                    {plan.cta}
+                  </a>
+                </article>
+              ))}
+            </div>
 
-          <p className={`${styles.pricingNote} ${styles.reveal}`}>
-            Free plan includes 20 credits/month · Pro includes 100 credits/month · Credits roll over one cycle ·{' '}
-            <a href="#pricing">Full credit breakdown</a>
-          </p>
-        </div>
-      </section>
+            <p className={`${styles.pricingNote} ${styles.reveal}`}>
+              Free plan includes 20 credits/month · Pro includes 100 credits/month · Credits roll over one cycle ·{' '}
+              <a href="#pricing">Full credit breakdown</a>
+            </p>
+          </div>
+        </section>
+      ) : null}
+
+      {waitlistMode ? (
+        <section className={styles.featuresSection}>
+          <div className={styles.sectionWrap}>
+            <div className={`${styles.eyebrow} ${styles.reveal}`}>
+              <span className={styles.eyebrowLine} />
+              Early access
+            </div>
+            <h2 className={`${styles.sectionTitle} ${styles.reveal}`}>
+              What happens
+              <br />
+              after you <span className={styles.accent}>join.</span>
+            </h2>
+            <p className={`${styles.sectionDeck} ${styles.reveal}`}>
+              We are not collecting emails for the sake of it. The waitlist is how we sequence invites and learn which
+              workflows to tighten before the full launch.
+            </p>
+
+            <div className={styles.featureGrid}>
+              {earlyAccessSteps.map((step) => (
+                <article key={step.title} className={`${styles.featureCard} ${styles.reveal}`}>
+                  <span className={`${styles.featureIcon} ${styles.tintBlue}`}>
+                    <ArrowMark size={12} />
+                  </span>
+                  <h3 className={styles.featureTitle}>{step.title}</h3>
+                  <p className={styles.featureDescription}>{step.description}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       {/* Bottom CTA — waitlist or sign-up depending on mode */}
       <section className={styles.waitlistSection}>
@@ -831,7 +894,8 @@ export default function MarketingHome({ appBaseUrl, waitlistMode }: MarketingHom
                 Be first when we launch.
               </h2>
               <p className={`${styles.waitlistDeck} ${styles.reveal}`}>
-                We&apos;re wrapping up final testing. Drop your email and we&apos;ll let you know the moment the doors open.
+                We&apos;re wrapping up final testing now. Join the list and we&apos;ll invite people in batches as soon
+                as access opens.
               </p>
               <div className={`${styles.waitlistFormWrap} ${styles.reveal}`}>
                 <WaitlistForm source="home-bottom" ctaLabel="Notify me" placeholder="Your email address" />
@@ -869,8 +933,8 @@ export default function MarketingHome({ appBaseUrl, waitlistMode }: MarketingHom
               <p className={styles.footerTagline}>
                 Your career, forward. AI-powered job search for people who take getting hired seriously.
               </p>
-              <a href={freeHref} className={styles.footerStart}>
-                Start free
+              <a href={primaryFooterHref} className={styles.footerStart}>
+                {waitlistMode ? 'Join waitlist' : 'Start free'}
                 <ArrowMark size={12} />
               </a>
             </div>
@@ -882,7 +946,7 @@ export default function MarketingHome({ appBaseUrl, waitlistMode }: MarketingHom
                 <a href="/resume">Resume builder</a>
                 <a href="/interview">Interview copilot</a>
                 <a href="/prep-kit">Prep kit</a>
-                <a href="#pricing">Pricing</a>
+                {!waitlistMode ? <a href="#pricing">Pricing</a> : null}
               </div>
             </div>
 
