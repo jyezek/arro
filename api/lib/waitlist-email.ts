@@ -62,38 +62,45 @@ async function syncWaitlistContact(
     throw new Error(existing.error.message)
   }
 
+  let contactId = existing.data?.id ?? null
+
   if (!existing.data) {
     const created = await resend.contacts.create({
       email,
       firstName,
       lastName,
       properties,
-      segments: segmentId ? [{ id: segmentId }] : undefined,
     })
 
     if (created.error) {
       throw new Error(created.error.message)
     }
 
-    return
-  }
+    contactId = created.data?.id ?? null
+  } else {
+    const updated = await resend.contacts.update({
+      email,
+      firstName: firstName ?? null,
+      lastName: lastName ?? null,
+      properties,
+    })
 
-  const updated = await resend.contacts.update({
-    email,
-    firstName: firstName ?? null,
-    lastName: lastName ?? null,
-    properties,
-  })
+    if (updated.error) {
+      throw new Error(updated.error.message)
+    }
 
-  if (updated.error) {
-    throw new Error(updated.error.message)
+    contactId = updated.data?.id ?? contactId
   }
 
   if (!segmentId) {
     return
   }
 
-  const segments = await resend.contacts.segments.list({ email, limit: 100 })
+  if (!contactId) {
+    throw new Error('Resend contact id missing after sync')
+  }
+
+  const segments = await resend.contacts.segments.list({ contactId, limit: 100 })
   if (segments.error) {
     throw new Error(segments.error.message)
   }
@@ -103,7 +110,7 @@ async function syncWaitlistContact(
     return
   }
 
-  const added = await resend.contacts.segments.add({ email, segmentId })
+  const added = await resend.contacts.segments.add({ contactId, segmentId })
   if (added.error) {
     throw new Error(added.error.message)
   }
