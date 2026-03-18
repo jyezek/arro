@@ -32,8 +32,12 @@ export default function WaitlistForm({
         body: JSON.stringify({ email: email.trim(), source: source ?? null }),
       })
       if (!res.ok) {
-        const data = await res.json() as { error?: string }
-        throw new Error(data.error ?? 'Something went wrong')
+        const contentType = res.headers.get('content-type') ?? ''
+        if (contentType.includes('application/json')) {
+          const data = await res.json() as { error?: string }
+          throw new Error(data.error ?? 'Something went wrong')
+        }
+        throw new Error('Waitlist signup is temporarily unavailable')
       }
       setStatus('success')
     } catch (err) {
