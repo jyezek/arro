@@ -1,0 +1,7 @@
+{
+  "buildCommand": "npx expo export --platform web",
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/((?!.*\\.(?:js|css|png|jpg|jpeg|gif|ico|svg|woff2?|ttf|eot|map|json)$).*)", "destination": "/index.html" }
+  ]
+}

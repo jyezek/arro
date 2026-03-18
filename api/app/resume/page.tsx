@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { resolveAppBaseUrl } from '../app-base-url'
+import { resolveAppBaseUrl, resolveWaitlistMode } from '../app-base-url'
 import ResumePage from './resume-page'
 
 export const metadata: Metadata = {
@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 }
 
 export default function ResumeLandingPage() {
-  return <ResumePage appBaseUrl={resolveAppBaseUrl()} />
+  return <ResumePage appBaseUrl={resolveAppBaseUrl()} waitlistMode={resolveWaitlistMode()} />
 }

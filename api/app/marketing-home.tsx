@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { DM_Sans } from 'next/font/google'
 import styles from './marketing-home.module.css'
+import WaitlistForm from './components/waitlist-form'
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -12,6 +13,7 @@ const dmSans = DM_Sans({
 
 type MarketingHomeProps = {
   appBaseUrl: string
+  waitlistMode: boolean
 }
 
 type FeatureCard = {
@@ -208,7 +210,7 @@ function CloseMark() {
   )
 }
 
-export default function MarketingHome({ appBaseUrl }: MarketingHomeProps) {
+export default function MarketingHome({ appBaseUrl, waitlistMode }: MarketingHomeProps) {
   const [billing, setBilling] = useState<'monthly' | 'annual'>('monthly')
   const [activeSection, setActiveSection] = useState('')
 
@@ -422,10 +424,14 @@ export default function MarketingHome({ appBaseUrl }: MarketingHomeProps) {
             </p>
 
             <div className={styles.heroActions}>
-              <a href={freeHref} className={styles.primaryCta}>
-                Start free — no card needed
-                <ArrowMark size={15} />
-              </a>
+              {waitlistMode ? (
+                <WaitlistForm source="home" ctaLabel="Join the waitlist" placeholder="Your work email" />
+              ) : (
+                <a href={freeHref} className={styles.primaryCta}>
+                  Start free — no card needed
+                  <ArrowMark size={15} />
+                </a>
+              )}
               <a href="#resume" className={styles.ghostCta}>
                 See how it works
               </a>
@@ -811,6 +817,40 @@ export default function MarketingHome({ appBaseUrl }: MarketingHomeProps) {
             Free plan includes 20 credits/month · Pro includes 100 credits/month · Credits roll over one cycle ·{' '}
             <a href="#pricing">Full credit breakdown</a>
           </p>
+        </div>
+      </section>
+
+      {/* Bottom CTA — waitlist or sign-up depending on mode */}
+      <section className={styles.waitlistSection}>
+        <div className={styles.sectionWrap}>
+          {waitlistMode ? (
+            <>
+              <h2 className={`${styles.waitlistTitle} ${styles.reveal}`}>
+                Be first when we launch.
+              </h2>
+              <p className={`${styles.waitlistDeck} ${styles.reveal}`}>
+                We&apos;re wrapping up final testing. Drop your email and we&apos;ll let you know the moment the doors open.
+              </p>
+              <div className={`${styles.waitlistFormWrap} ${styles.reveal}`}>
+                <WaitlistForm source="home-bottom" ctaLabel="Notify me" placeholder="Your email address" />
+              </div>
+            </>
+          ) : (
+            <>
+              <h2 className={`${styles.waitlistTitle} ${styles.reveal}`}>
+                Ready to stop winging it?
+              </h2>
+              <p className={`${styles.waitlistDeck} ${styles.reveal}`}>
+                Start free. No card required. Upgrade when it&apos;s worth it.
+              </p>
+              <div className={`${styles.waitlistFormWrap} ${styles.reveal}`}>
+                <a href={freeHref} className={styles.primaryCta}>
+                  Start free — no card needed
+                  <ArrowMark size={15} />
+                </a>
+              </div>
+            </>
+          )}
         </div>
       </section>
 

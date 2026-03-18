@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { DM_Sans } from 'next/font/google'
 import styles from './jobs-page.module.css'
+import WaitlistForm from '../components/waitlist-form'
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -12,6 +13,7 @@ const dmSans = DM_Sans({
 
 type JobsPageProps = {
   appBaseUrl: string
+  waitlistMode: boolean
 }
 
 function buildHref(appBaseUrl: string, path: string): string {
@@ -120,7 +122,7 @@ function getMatchColor(match: number): string {
   return styles.matchLow
 }
 
-export default function JobsPage({ appBaseUrl }: JobsPageProps) {
+export default function JobsPage({ appBaseUrl, waitlistMode }: JobsPageProps) {
   const signUpHref = buildHref(appBaseUrl, '/sign-up')
   const signInHref = buildHref(appBaseUrl, '/sign-in')
   const [visible, setVisible] = useState(false)
@@ -246,10 +248,14 @@ export default function JobsPage({ appBaseUrl }: JobsPageProps) {
               Aggregated from LinkedIn, Indeed, Dice, and dozens more — then ranked by how well each role actually matches your background. See the jobs most likely to want you, first.
             </p>
             <div className={styles.heroActions}>
-              <a href={signUpHref} className={styles.primaryCta}>
-                Start free — no card needed
-                <ArrowMark size={15} />
-              </a>
+              {waitlistMode ? (
+                <WaitlistForm source="jobs" ctaLabel="Join the waitlist" placeholder="Your email" />
+              ) : (
+                <a href={signUpHref} className={styles.primaryCta}>
+                  Start free — no card needed
+                  <ArrowMark size={15} />
+                </a>
+              )}
             </div>
             <div className={styles.heroProof}>
               {['50+ job sources', 'Ranked by real fit', 'New postings daily'].map((item, i, arr) => (
@@ -389,11 +395,21 @@ export default function JobsPage({ appBaseUrl }: JobsPageProps) {
       {/* Footer CTA */}
       <section className={styles.footerCta}>
         <div className={styles.footerCtaInner}>
-          <h2 className={styles.footerCtaTitle}>Start free — the whole platform for $0</h2>
-          <p className={styles.footerCtaDeck}>No card required. Upgrade when it&apos;s worth it.</p>
-          <a href={signUpHref} className={styles.primaryCta}>
-            Get started free <ArrowMark size={15} />
-          </a>
+          {waitlistMode ? (
+            <>
+              <h2 className={styles.footerCtaTitle}>Be first when we launch.</h2>
+              <p className={styles.footerCtaDeck}>We&apos;re wrapping up final testing. Get notified the moment the doors open.</p>
+              <WaitlistForm source="jobs-bottom" ctaLabel="Notify me" placeholder="Your email address" />
+            </>
+          ) : (
+            <>
+              <h2 className={styles.footerCtaTitle}>Start free — the whole platform for $0</h2>
+              <p className={styles.footerCtaDeck}>No card required. Upgrade when it&apos;s worth it.</p>
+              <a href={signUpHref} className={styles.primaryCta}>
+                Get started free <ArrowMark size={15} />
+              </a>
+            </>
+          )}
         </div>
       </section>
 

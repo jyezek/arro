@@ -1,5 +1,5 @@
 import { useSignUp } from '@clerk/clerk-expo'
-import { Link, useRouter } from 'expo-router'
+import { Link, useRouter, useLocalSearchParams } from 'expo-router'
 import {
   View,
   Text,
@@ -13,7 +13,7 @@ import {
 } from 'react-native'
 import { useState } from 'react'
 import { Colors, FontSize, Radius, Spacing, wm } from '@/constants/Colors'
-import { deleteItem } from '@/lib/storage'
+import { deleteItem, setItem } from '@/lib/storage'
 
 type ClerkErrorLike = {
   errors?: Array<{
@@ -84,6 +84,7 @@ function needsPhoneNumber(result: VerificationAttemptResult): boolean {
 export default function SignUpScreen() {
   const { signUp, setActive, isLoaded } = useSignUp()
   const router = useRouter()
+  const { plan, intent } = useLocalSearchParams<{ plan?: string; intent?: string }>()
   const signUpResource = signUp as SignUpResourceLike | undefined
 
   const [firstName, setFirstName] = useState('')
@@ -179,6 +180,9 @@ export default function SignUpScreen() {
       const result = await signUpResource.attemptEmailAddressVerification({ code: code.trim() })
       if (result.status === 'complete') {
         await deleteItem('onboarding_complete')
+        // Store intent so _layout can redirect after onboarding completes
+        const pendingIntent = plan ?? intent
+        if (pendingIntent) await setItem('pending_intent', pendingIntent)
         await setActive({ session: result.createdSessionId })
         router.replace('/onboarding')
       } else if (needsPhoneNumber(result)) {
@@ -222,6 +226,8 @@ export default function SignUpScreen() {
       const result = await signUpResource.attemptPhoneNumberVerification({ code: phoneCode.trim() })
       if (result.status === 'complete') {
         await deleteItem('onboarding_complete')
+        const pendingIntent = plan ?? intent
+        if (pendingIntent) await setItem('pending_intent', pendingIntent)
         await setActive({ session: result.createdSessionId })
         router.replace('/onboarding')
       } else {

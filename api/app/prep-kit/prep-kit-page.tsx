@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { DM_Sans } from 'next/font/google'
 import styles from './prep-kit-page.module.css'
+import WaitlistForm from '../components/waitlist-form'
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -12,6 +13,7 @@ const dmSans = DM_Sans({
 
 type PrepKitPageProps = {
   appBaseUrl: string
+  waitlistMode: boolean
 }
 
 function buildHref(appBaseUrl: string, path: string): string {
@@ -141,7 +143,7 @@ const featurePoints = [
   { title: 'Ready to send', desc: 'Formatted, professional, and actually good. Not a template.', tint: 'amber' },
 ]
 
-export default function PrepKitPage({ appBaseUrl }: PrepKitPageProps) {
+export default function PrepKitPage({ appBaseUrl, waitlistMode }: PrepKitPageProps) {
   const signUpHref = buildHref(appBaseUrl, '/sign-up')
   const signInHref = buildHref(appBaseUrl, '/sign-in')
   const [activeTab, setActiveTab] = useState<Tab>('cover')
@@ -244,10 +246,14 @@ export default function PrepKitPage({ appBaseUrl }: PrepKitPageProps) {
               Cover letter, screening answers, follow-up emails — all generated from your master profile and the job description. A full application kit for every role, in seconds.
             </p>
             <div className={styles.heroActions}>
-              <a href={signUpHref} className={styles.primaryCta}>
-                Start free — no card needed
-                <ArrowMark size={15} />
-              </a>
+              {waitlistMode ? (
+                <WaitlistForm source="prep-kit" ctaLabel="Join the waitlist" placeholder="Your email" />
+              ) : (
+                <a href={signUpHref} className={styles.primaryCta}>
+                  Start free — no card needed
+                  <ArrowMark size={15} />
+                </a>
+              )}
             </div>
             <div className={styles.heroProof}>
               {['4 documents per role', 'Built from your profile', 'Job-specific language'].map((item, i, arr) => (
@@ -365,11 +371,21 @@ export default function PrepKitPage({ appBaseUrl }: PrepKitPageProps) {
       {/* Footer CTA */}
       <section className={styles.footerCta}>
         <div className={styles.footerCtaInner}>
-          <h2 className={styles.footerCtaTitle}>Start free — the whole platform for $0</h2>
-          <p className={styles.footerCtaDeck}>No card required. Upgrade when it&apos;s worth it.</p>
-          <a href={signUpHref} className={styles.primaryCta}>
-            Get started free <ArrowMark size={15} />
-          </a>
+          {waitlistMode ? (
+            <>
+              <h2 className={styles.footerCtaTitle}>Be first when we launch.</h2>
+              <p className={styles.footerCtaDeck}>We&apos;re wrapping up final testing. Get notified the moment the doors open.</p>
+              <WaitlistForm source="prep-kit-bottom" ctaLabel="Notify me" placeholder="Your email address" />
+            </>
+          ) : (
+            <>
+              <h2 className={styles.footerCtaTitle}>Start free — the whole platform for $0</h2>
+              <p className={styles.footerCtaDeck}>No card required. Upgrade when it&apos;s worth it.</p>
+              <a href={signUpHref} className={styles.primaryCta}>
+                Get started free <ArrowMark size={15} />
+              </a>
+            </>
+          )}
         </div>
       </section>
 

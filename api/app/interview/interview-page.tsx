@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { DM_Sans } from 'next/font/google'
 import styles from './interview-page.module.css'
+import WaitlistForm from '../components/waitlist-form'
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -12,6 +13,7 @@ const dmSans = DM_Sans({
 
 type InterviewPageProps = {
   appBaseUrl: string
+  waitlistMode: boolean
 }
 
 function buildHref(appBaseUrl: string, path: string): string {
@@ -96,7 +98,7 @@ const featurePoints = [
 // Animation phases: 0=question, 1=answer, 2=copilot, 3=fade
 type Phase = 0 | 1 | 2 | 3
 
-export default function InterviewPage({ appBaseUrl }: InterviewPageProps) {
+export default function InterviewPage({ appBaseUrl, waitlistMode }: InterviewPageProps) {
   const signUpHref = buildHref(appBaseUrl, '/sign-up')
   const signInHref = buildHref(appBaseUrl, '/sign-in')
 
@@ -239,10 +241,14 @@ export default function InterviewPage({ appBaseUrl }: InterviewPageProps) {
               Arro runs a full practice interview, gives you real-time coaching, and lets you pause to ask the copilot anything — personalized to the exact role you&apos;re applying for.
             </p>
             <div className={styles.heroActions}>
-              <a href={signUpHref} className={styles.primaryCta}>
-                Start free — no card needed
-                <ArrowMark size={15} />
-              </a>
+              {waitlistMode ? (
+                <WaitlistForm source="interview" ctaLabel="Join the waitlist" placeholder="Your email" />
+              ) : (
+                <a href={signUpHref} className={styles.primaryCta}>
+                  Start free — no card needed
+                  <ArrowMark size={15} />
+                </a>
+              )}
             </div>
             <div className={styles.heroProof}>
               {['Voice AI, no typing', 'Real-time confidence coaching', 'Built from the actual job description'].map((item, i, arr) => (
@@ -422,12 +428,22 @@ export default function InterviewPage({ appBaseUrl }: InterviewPageProps) {
       {/* Footer CTA */}
       <section className={styles.footerCta}>
         <div className={styles.footerCtaInner}>
-          <h2 className={styles.footerCtaTitle}>Start free — the whole platform for $0</h2>
-          <p className={styles.footerCtaDeck}>No card required. Upgrade when it&apos;s worth it.</p>
-          <a href={signUpHref} className={styles.primaryCta}>
-            Get started free
-            <ArrowMark size={15} />
-          </a>
+          {waitlistMode ? (
+            <>
+              <h2 className={styles.footerCtaTitle}>Be first when we launch.</h2>
+              <p className={styles.footerCtaDeck}>We&apos;re wrapping up final testing. Get notified the moment the doors open.</p>
+              <WaitlistForm source="interview-bottom" ctaLabel="Notify me" placeholder="Your email address" />
+            </>
+          ) : (
+            <>
+              <h2 className={styles.footerCtaTitle}>Start free — the whole platform for $0</h2>
+              <p className={styles.footerCtaDeck}>No card required. Upgrade when it&apos;s worth it.</p>
+              <a href={signUpHref} className={styles.primaryCta}>
+                Get started free
+                <ArrowMark size={15} />
+              </a>
+            </>
+          )}
         </div>
       </section>
 

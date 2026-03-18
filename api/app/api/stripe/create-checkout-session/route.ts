@@ -7,11 +7,31 @@ export async function POST(req: NextRequest) {
   try {
     const stripe = getStripe()
     const user = await getOrCreateUser()
-    const { priceId, type, credits } = await req.json() as {
-      priceId: string
-      type: 'subscription' | 'credits'
+    const body = await req.json() as {
+      priceId?: string
+      plan?: string
+      type?: 'subscription' | 'credits'
       credits?: number
     }
+
+    // Resolve priceId — accept either a raw priceId or a plan name alias
+    const planPriceMap: Record<string, string | undefined> = {
+      pro_monthly: process.env.STRIPE_PRICE_PRO_MONTHLY,
+      pro_annual:  process.env.STRIPE_PRICE_PRO_ANNUAL,
+      credits_50:  process.env.STRIPE_PRICE_CREDITS_50,
+      credits_150: process.env.STRIPE_PRICE_CREDITS_150,
+      credits_500: process.env.STRIPE_PRICE_CREDITS_500,
+    }
+
+    const priceId = body.priceId ?? (body.plan ? planPriceMap[body.plan] : undefined)
+    if (!priceId) {
+      return NextResponse.json({ error: 'Missing or unrecognised price' }, { status: 400 })
+    }
+
+    // Infer type from plan name if not provided explicitly
+    const isCredits = body.plan?.startsWith('credits_') ?? false
+    const type: 'subscription' | 'credits' = body.type ?? (isCredits ? 'credits' : 'subscription')
+    const credits = body.credits ?? (body.plan === 'credits_50' ? 50 : body.plan === 'credits_150' ? 150 : body.plan === 'credits_500' ? 500 : 0)
 
     const customerId = await getOrCreateStripeCustomer(
       user.id,

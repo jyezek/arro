@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { resolveAppBaseUrl } from './app-base-url'
+import { resolveAppBaseUrl, resolveWaitlistMode } from './app-base-url'
 import MarketingHome from './marketing-home'
 
 export const metadata: Metadata = {
@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 }
 
 export default function HomePage() {
-  return <MarketingHome appBaseUrl={resolveAppBaseUrl()} />
+  return <MarketingHome appBaseUrl={resolveAppBaseUrl()} waitlistMode={resolveWaitlistMode()} />
 }

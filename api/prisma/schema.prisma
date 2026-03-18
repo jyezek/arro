@@ -327,3 +327,15 @@ model DeletionLog {
 
   @@map("deletion_log")
 }
+
+// ─── Waitlist ─────────────────────────────────────────────────────────────────
+
+model WaitlistEntry {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  source    String?  // utm_source or referrer slug (e.g. "interview", "resume", "jobs")
+  createdAt DateTime @default(now())
+
+  @@map("waitlist_entries")
+}

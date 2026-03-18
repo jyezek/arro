@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router'
+import { useRouter, useLocalSearchParams } from 'expo-router'
 import { useState, useEffect } from 'react'
 import {
   View,
@@ -31,31 +31,44 @@ const FEATURES_PRO = [
   { label: 'Priority AI queue', included: true },
 ]
 
+const PLAN_CONFIG = {
+  pro_monthly: { label: 'Pro — Monthly', price: '$24', per: '/mo', cadence: 'Billed monthly · cancel anytime' },
+  pro_annual:  { label: 'Pro — Annual',  price: '$18', per: '/mo', cadence: 'Billed $216/year · save 25%' },
+} as const
+
+type PlanKey = keyof typeof PLAN_CONFIG
+
 export default function UpgradeScreen() {
   const router = useRouter()
   const { getToken } = useAuth()
+  const { plan: planParam, cancelled } = useLocalSearchParams<{ plan?: string; cancelled?: string }>()
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const plan: PlanKey = (planParam && planParam in PLAN_CONFIG) ? planParam as PlanKey : 'pro_monthly'
+  const config = PLAN_CONFIG[plan]
 
   useEffect(() => {
     void getToken().then(token =>
-      apiRequest('/api/track', { method: 'POST', body: JSON.stringify({ event: 'upgrade_prompted' }) }, token)
+      apiRequest('/api/track', { method: 'POST', body: JSON.stringify({ event: 'upgrade_prompted', plan }) }, token)
     ).catch(() => {})
   }, [])
 
   const handleUpgrade = async () => {
     setLoading(true)
+    setError('')
     try {
       const token = await getToken()
       const data = await apiRequest<{ url: string }>(
         '/api/stripe/create-checkout-session',
-        { method: 'POST', body: JSON.stringify({ plan: 'pro' }) },
+        { method: 'POST', body: JSON.stringify({ plan }) },
         token
       )
-      // On native, open the URL via Linking
       const { Linking } = await import('react-native')
       await Linking.openURL(data.url)
     } catch (err) {
       console.error('Checkout failed:', err)
+      setError('Something went wrong. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -73,11 +86,40 @@ export default function UpgradeScreen() {
           Unlock unlimited AI tools and get hired faster.
         </Text>
 
+        {cancelled === 'true' ? (
+          <View style={styles.cancelledBanner}>
+            <Text style={styles.cancelledText}>Checkout cancelled — no charge was made.</Text>
+          </View>
+        ) : null}
+
+        {error ? (
+          <View style={styles.cancelledBanner}>
+            <Text style={styles.cancelledText}>{error}</Text>
+          </View>
+        ) : null}
+
+        {/* Plan toggle */}
+        <View style={styles.planToggle}>
+          {(Object.keys(PLAN_CONFIG) as PlanKey[]).map((key) => (
+            <Pressable
+              key={key}
+              style={[styles.planToggleBtn, plan === key && styles.planToggleBtnActive]}
+              onPress={() => router.setParams({ plan: key })}
+            >
+              <Text style={[styles.planToggleBtnText, plan === key && styles.planToggleBtnTextActive]}>
+                {key === 'pro_monthly' ? 'Monthly' : 'Annual'}
+              </Text>
+              {key === 'pro_annual' ? <Text style={styles.savePill}>Save 25%</Text> : null}
+            </Pressable>
+          ))}
+        </View>
+
         {/* Price */}
         <View style={styles.priceCard}>
-          <Text style={styles.price}>$19</Text>
-          <Text style={styles.pricePer}>/month</Text>
+          <Text style={styles.price}>{config.price}</Text>
+          <Text style={styles.pricePer}>{config.per}</Text>
         </View>
+        <Text style={styles.cadence}>{config.cadence}</Text>
 
         {/* Feature list */}
         <View style={styles.featureSection}>
@@ -100,7 +142,7 @@ export default function UpgradeScreen() {
         >
           {loading
             ? <ActivityIndicator color={Colors.white} />
-            : <Text style={styles.ctaText}>Start Pro — $19/month</Text>
+            : <Text style={styles.ctaText}>{config.label} — {config.price}{config.per}</Text>
           }
         </Pressable>
 
@@ -174,6 +216,25 @@ const styles = StyleSheet.create({
   ctaDisabled: { opacity: 0.6 },
   ctaText: { color: Colors.white, fontSize: FontSize.xl, fontWeight: '700' },
 
+  cadence: { textAlign: 'center', fontSize: FontSize.sm, color: wm(0.35), marginTop: -Spacing[4] },
+  planToggle: { flexDirection: 'row', gap: 8 },
+  planToggleBtn: {
+    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
+    paddingVertical: 10, borderRadius: Radius.card,
+    backgroundColor: wm(0.05), borderWidth: 1, borderColor: wm(0.08),
+  },
+  planToggleBtnActive: { backgroundColor: orangeAlpha(0.1), borderColor: orangeAlpha(0.25) },
+  planToggleBtnText: { fontSize: FontSize.md, fontWeight: '600', color: wm(0.4) },
+  planToggleBtnTextActive: { color: Colors.orange },
+  savePill: {
+    fontSize: FontSize.xs, fontWeight: '700', color: Colors.orange,
+    backgroundColor: orangeAlpha(0.12), paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4,
+  },
+  cancelledBanner: {
+    backgroundColor: 'rgba(226,75,74,0.08)', borderRadius: Radius.input,
+    padding: Spacing[4], borderWidth: 1, borderColor: 'rgba(226,75,74,0.15)',
+  },
+  cancelledText: { color: 'rgb(226,75,74)', fontSize: FontSize.sm },
   finePrint: { textAlign: 'center', fontSize: FontSize.sm, color: wm(0.25) },
   dismissBtn: { alignItems: 'center', paddingVertical: Spacing[2] },
   dismissText: { fontSize: FontSize.md, color: wm(0.35), fontWeight: '500' },

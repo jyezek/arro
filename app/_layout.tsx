@@ -3,7 +3,7 @@ import { tokenCache } from '@/lib/tokenCache'
 import { Stack, useRouter, useSegments } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { deleteItem, getItem, setItem } from '@/lib/storage'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import 'react-native-reanimated'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
@@ -45,6 +45,7 @@ function InitialLayout() {
   const segments = useSegments()
   const router = useRouter()
   const [onboardingComplete, setOnboardingComplete] = useState<boolean | null>(null)
+  const intentHandled = useRef(false)
 
   useEffect(() => {
     let cancelled = false
@@ -107,6 +108,22 @@ function InitialLayout() {
       router.replace('/onboarding')
     } else if (inOnboarding && onboardingComplete) {
       router.replace('/(tabs)')
+      // Check for a post-signup purchase intent stored during sign-up
+      if (!intentHandled.current) {
+        intentHandled.current = true
+        void getItem('pending_intent').then(async (pendingIntent) => {
+          if (!pendingIntent) return
+          await deleteItem('pending_intent')
+          // Brief delay to let the tabs navigation settle before pushing a modal
+          setTimeout(() => {
+            if (pendingIntent === 'credits') {
+              router.push('/credits')
+            } else {
+              router.push(`/upgrade?plan=${pendingIntent}`)
+            }
+          }, 400)
+        })
+      }
     }
   }, [isLoaded, isSignedIn, segments, onboardingComplete, router])
 

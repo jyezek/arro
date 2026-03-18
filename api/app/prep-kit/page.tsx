@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { resolveAppBaseUrl } from '../app-base-url'
+import { resolveAppBaseUrl, resolveWaitlistMode } from '../app-base-url'
 import PrepKitPage from './prep-kit-page'
 
 export const metadata: Metadata = {
@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 }
 
 export default function PrepKitLandingPage() {
-  return <PrepKitPage appBaseUrl={resolveAppBaseUrl()} />
+  return <PrepKitPage appBaseUrl={resolveAppBaseUrl()} waitlistMode={resolveWaitlistMode()} />
 }
